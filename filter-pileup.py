@@ -24,21 +24,20 @@ for lines in input:
   lines=lines.rstrip('\n')
   linesplit = re.split('\t',lines)
   line = linesplit[4]
-  #print line
 
   # filter deletions
   while (re.search('(-[0-9]+[ACGTNacgtn]+)',line)):
     if re.search('(-[0-9]+)',line):
-      count = re.search('([0-9]+)',line).group(1)  
-      str = '(-[0-9]+[A-Za-z]{' + count + '})'
-      line = re.sub(str,'',line)
+      count = re.search('(-[0-9]+)',line).group(1)  
+      str_command = '(-[0-9]+[A-Za-z]{' + str(abs(int(count))) + '})'
+      line = re.sub(str_command,'',line)
 
   # filter insertion
   while (re.search('(\+[0-9]+[ACGTNacgtn]+)',line)):
     if re.search('(\+[0-9]+)',line):
-      count = re.search('([0-9]+)',line).group(1)
-      str = '(\+[0-9]+[A-Za-z]{' + count + '})'
-      line = re.sub(str,'',line)
+      count = re.search('(\+[0-9]+)',line).group(1)
+      str_command = '(\+[0-9]+[A-Za-z]{' + str(abs(int(count))) + '})'
+      line = re.sub(str_command,'',line)
   
   # filter ^ and its next chatacter
   while (re.search('\^.{1}',line)):
