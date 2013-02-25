@@ -1,0 +1,44 @@
+#ftp://ftp.jgi-psf.org/pub/compgen/phytozome/v8.0/Gmax_v1.0/  
+
+bowtie2-build Gmax_109.fa Gmax_genome
+
+env |grep BOWTIE
+#BOWTIE_INDEXES=/scratch/user/rkumar/softwares/bowtie-0.12.8/indexes/
+
+#mv Gmax_genome.* ~/workdir/softwares/bowtie-0.12.8/indexes/
+
+#tophat -G Gmax_109_gene_exons.gff3 -o H1_thout Gmax_genome H1.fastq H1_R.fastq
+
+And same way for all 6 samples.
+
+tophat -G Gmax_109_gene_exons.gff3 -o H1_thout Gmax_genome H1.fastq H1_R.fastq
+tophat -G Gmax_109_gene_exons.gff3 -o H2_thout Gmax_genome H2.fastq H2_R.fastq
+tophat -G Gmax_109_gene_exons.gff3 -o H1_thout Gmax_genome H3.fastq H3_R.fastq
+tophat -G Gmax_109_gene_exons.gff3 -o N2_thout Gmax_genome N2.fastq N2_R.fastq
+tophat -G Gmax_109_gene_exons.gff3 -o N3_thout Gmax_genome N3.fastq N3_R.fastq
+tophat -G Gmax_109_gene_exons.gff3 -o N5_thout Gmax_genome N5.fastq N5_R.fastq
+
+
+cufflinks -p 4 -o H1_clout ../H1_thout/accepted_hits.bam
+cufflinks -p 4 -o H2_clout ../H2_thout/accepted_hits.bam
+cufflinks -p 4 -o H3_clout ../H3_thout/accepted_hits.bam
+cufflinks -p 4 -o N2_clout ../N2_thout/accepted_hits.bam
+cufflinks -p 4 -o N3_clout ../N3_thout/accepted_hits.bam
+cufflinks -p 4 -o N5_clout ../N5_thout/accepted_hits.bam
+
+Create a file called assemblies.txt that lists the assembly file for each sample. The file should contain the following lines:
+H1_clout/transcripts.gtf
+H2_clout/transcripts.gtf
+H3_clout/transcripts.gtf
+N2_clout/transcripts.gtf
+N3_clout/transcripts.gtf
+N5_clout/transcripts.gtf
+
+cuffmerge -g ../Gmax_109_gene_exons.gff3 -s ../Gmax_genome.fa -p 4 assemblies.txt
+
+#Run Cuffdiff by using the merged transcriptome assembly along with the BAM files from TopHat for each replicate:
+
+cuffdiff -o diff_out -b ../Gmax_genome.fa -p 8 -L H,N -u merged_asm/merged.gtf \
+../H1_thout/accepted_hits.bam,../H2_thout/accepted_hits.bam,../H3_thout/accepted_hits.bam \
+../N2_thout/accepted_hits.bam,../N3_thout/accepted_hits.bam,../N5_thout/accepted_hits.bam
+
